@@ -1,14 +1,14 @@
 FROM node:lts-alpine as build-frontend
 WORKDIR /home/jackito/map/frontend
 COPY frontend/ .
-RUN sudo yarn install --ignore-engines
-RUN sudo yarn run build
+RUN yarn install --ignore-engines
+RUN yarn run build
 
 FROM node:lts-alpine as build-backend
 WORKDIR /home/jackito/map/backend
 COPY backend/ .
-RUN sudo yarn install --ignore-engines
-RUN sudo yarn run build
+RUN yarn install --ignore-engines
+RUN yarn run build
 
 FROM node:lts
 WORKDIR /home/jackito/map
@@ -20,7 +20,7 @@ COPY --from=0 /home/jackito/map/frontend/dist ./frontend/dist
 
 WORKDIR /home/jackito/map/backend
 COPY ./backend/package.json .
-RUN sudo yarn install --ignore-engines --prod
+RUN sudo install --ignore-engines --prod
 COPY --from=1 /home/jackito/map/backend/dist .
 RUN npx prisma generate
 
