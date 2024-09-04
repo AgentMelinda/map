@@ -1,30 +1,30 @@
 FROM node:lts-alpine as build-frontend
-WORKDIR /home/jackito/map/frontend
+WORKDIR /home/jackito/home/jackito/app/frontend
 COPY frontend/ .
-RUN yarn install --ignore-engines
+RUN yarn install
 RUN yarn run build
 
 FROM node:lts-alpine as build-backend
-WORKDIR /home/jackito/map/backend
+WORKDIR /home/jackito/home/jackito/app/backend
 COPY backend/ .
-RUN yarn install --ignore-engines
+RUN yarn install
 RUN yarn run build
 
 FROM node:lts
-WORKDIR /home/jackito/map
+WORKDIR /home/jackito/app
 
 COPY ./entrypoint.sh .
 
-COPY --from=1 /home/jackito/map/backend/prisma/schema.prisma ./backend/prisma/schema.prisma
-COPY --from=0 /home/jackito/map/frontend/dist ./frontend/dist
+COPY --from=1 /home/jackito/app/backend/prisma/schema.prisma ./backend/prisma/schema.prisma
+COPY --from=0 /home/jackito/app/frontend/dist ./frontend/dist
 
-WORKDIR /home/jackito/map/backend
+WORKDIR /home/jackito/app/backend
 COPY ./backend/package.json .
-RUN sudo install --ignore-engines --prod
-COPY --from=1 /home/jackito/map/backend/dist .
+RUN yarn install --prod
+COPY --from=1 /home/jackito/app/backend/dist .
 RUN npx prisma generate
 
-RUN ["chmod", "+x", "/home/jackito/map/entrypoint.sh"]
+RUN ["chmod", "+x", "/home/jackito/app/entrypoint.sh"]
 EXPOSE 8899
 
-ENTRYPOINT /home/jackito/map/entrypoint.sh
+ENTRYPOINT /home/jackito/app/entrypoint.sh
